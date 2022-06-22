@@ -1,43 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import TaskList from './components/TaskList.js';
 import './App.css';
+import axios from 'axios';
 
-const TASKS = [
-  {
-    id: 1,
-    title: 'Mow the lawn',
-    isComplete: false,
-  },
-  {
-    id: 2,
-    title: 'Cook Pasta',
-    isComplete: true,
-  },
-  {
-    id: 3,
-    title: 'Take a nap',
-    isComplete: false,
-  },
-];
+const URL = 'https://stormy-badlands-08394.herokuapp.com/tasks';
 
 const App = () => {
-  const [tasks, setTasks] = useState(TASKS);
+  const [tasks, setTasks] = useState([]);
 
-  const updateTasks = (updatedTask) => {
-    const updatedTasks = tasks.map((task) => {
-      if (task.id === updatedTask.id) {
-        return updatedTask;
-      } else {
-        return task;
-      }
-    });
-
-    setTasks(updatedTasks);
+  const getTasks = () => {
+    axios
+      .get(URL)
+      .then((response) => {
+        const newTasks = response.data.map((task) => {
+          return {
+            id: task.id,
+            title: task.title,
+            isComplete: task.is_complete,
+          };
+        });
+        setTasks(newTasks);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
-  const deleteTask = (idToDelete) => {
-    const updatedTasks = tasks.filter((task) => task.id !== idToDelete);
-    setTasks(updatedTasks);
+  useEffect(() => getTasks(), []);
+
+  const toggleComplete = (id, isComplete) => {
+    const updateURL = isComplete
+      ? `${URL}/${id}/mark_incomplete`
+      : `${URL}/${id}/mark_complete`;
+    axios
+      .patch(updateURL)
+      .then(() => getTasks())
+      .catch((err) => console.log(err));
+  };
+
+  const deleteTask = (id) => {
+    axios
+      .delete(`${URL}/${id}`)
+      .then(() => getTasks())
+      .catch((err) => console.log(err));
   };
 
   return (
@@ -49,7 +54,7 @@ const App = () => {
         <div>
           <TaskList
             tasks={tasks}
-            onUpdateTask={updateTasks}
+            onUpdateTask={toggleComplete}
             onDeleteTask={deleteTask}
           />
         </div>

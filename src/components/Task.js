@@ -4,27 +4,24 @@ import './Task.css';
 
 const Task = ({ id, title, isComplete, onUpdate, onDelete }) => {
   const buttonClass = isComplete ? 'tasks__item__toggle--completed' : '';
-  const setComplete = () => {
-    const updatedTask = {
-      id,
-      title,
-      isComplete: !isComplete,
-    };
-    onUpdate(updatedTask);
+
+  const toggleComplete = () => {
+    onUpdate(id, isComplete);
+  };
+
+  const deleteTask = () => {
+    onDelete(id);
   };
 
   return (
     <li className="tasks__item">
       <button
         className={`tasks__item__toggle ${buttonClass}`}
-        onClick={setComplete}
+        onClick={toggleComplete}
       >
         {title}
       </button>
-      <button
-        className="tasks__item__remove button"
-        onClick={() => onDelete(id)}
-      >
+      <button className="tasks__item__remove button" onClick={deleteTask}>
         x
       </button>
     </li>
