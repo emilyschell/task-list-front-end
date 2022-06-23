@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import TaskList from './components/TaskList.js';
 import './App.css';
 import axios from 'axios';
+import NewTaskForm from './components/NewTaskForm.js';
 
 const URL = 'https://stormy-badlands-08394.herokuapp.com/tasks';
 
@@ -45,6 +46,13 @@ const App = () => {
       .catch((err) => console.log(err));
   };
 
+  const addTask = (newTask) => {
+    axios
+      .post(URL, newTask)
+      .then(() => getTasks())
+      .catch((err) => console.log(err));
+  };
+
   return (
     <div className="App">
       <header className="App-header">
@@ -57,6 +65,7 @@ const App = () => {
             onUpdateTask={toggleComplete}
             onDeleteTask={deleteTask}
           />
+          <NewTaskForm addTaskCallback={addTask} />
         </div>
       </main>
     </div>
